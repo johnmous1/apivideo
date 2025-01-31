@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Upload and Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .video-container {
+            margin-top: 20px;
+        }
+        video {
+            width: 100%;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Upload and Stream Video</h1>
+
+    <!-- Upload Video -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="videoUpload">Upload Video:</label>
+        <input type="file" id="videoUpload" name="video" accept="video/*" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Stream Video -->
+    <div class="video-container" id="uploadVideoContainer" style="display:none;">
+        <h2>Uploaded Video</h2>
+        <video id="uploadedVideo" controls></video>
+    </div>
+
+    <hr>
+
+    <!-- Stream Existing Video -->
+    <form id="streamForm">
+        <label for="videoName">Video Filename:</label>
+        <input type="text" id="videoName" name="videoName" placeholder="Enter video filename" required>
+        <button type="submit">Stream</button>
+    </form>
+
+    <!-- Stream Existing Video -->
+    <div class="video-container" id="streamedVideoContainer" style="display:none;">
+        <h2>Streamed Video</h2>
+        <video id="streamedVideo" controls></video>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uploadedVideo').src = data.path;
+                document.getElementById('uploadVideoContainer').style.display = 'block';
+            })
+            .catch(error => console.error('Error uploading video:', error));
+    });
+
+    document.getElementById('streamForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var videoName = document.getElementById('videoName').value;
+        document.getElementById('streamedVideo').src = `/stream/${videoName}`;
+        document.getElementById('streamedVideoContainer').style.display = 'block';
+    });
+</script>
+</body>
+</html>
+
